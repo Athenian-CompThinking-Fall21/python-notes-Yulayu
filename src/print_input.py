@@ -6,3 +6,6 @@
 #############################
 
 # Write code here:
+print("Hello world!")
+print(4 + 5)
+print(2 + 4)
