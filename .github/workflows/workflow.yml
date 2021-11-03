@@ -1,0 +1,55 @@
+name: Build and Test
+# only style tests
+
+on:
+  push:
+    paths:
+      - 'src/variables.py'
+      - 'src/print_input.py'
+      - 'src/functions.py'
+      - 'src/if_statements.py'
+      - 'src/for_loops.py'
+      - 'src/while_loops.py'
+      - 'src/lists.py'
+jobs:
+
+  Style_test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python3 -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Lint student program
+      id: style
+      continue-on-error: true
+      run: |
+        flake8 src/print_input.py >> .github/ISSUE_TEMPLATE/style-issues.md
+        flake8 src/variables.py >> .github/ISSUE_TEMPLATE/style-issues.md
+        flake8 src/functions.py >> .github/ISSUE_TEMPLATE/style-issues.md
+        flake8 src/if_statements.py >> .github/ISSUE_TEMPLATE/style-issues.md
+        flake8 src/for_loops.py >> .github/ISSUE_TEMPLATE/style-issues.md
+        flake8 src/while_loops.py >> .github/ISSUE_TEMPLATE/style-issues.md
+        flake8 src/lists.py >> .github/ISSUE_TEMPLATE/style-issues.md
+
+
+    - name: Style fail message
+      if: steps.style.outcome == 'failure'
+      uses: machine-learning-apps/pr-comment@1.0.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        path: .github/ISSUE_TEMPLATE/style-issues.md
+
+    - name: Success message
+      if: steps.style.outcome == 'success'
+      uses: machine-learning-apps/pr-comment@1.0.0
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      with:
+        path: .github/ISSUE_TEMPLATE/test-success.md
